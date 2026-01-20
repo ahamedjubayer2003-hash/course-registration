@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUET Smart Form | ME & ChE Database</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* UI Styles remain unchanged */
+        :root { --bg: #020617; --card: rgba(15, 23, 42, 0.9); --accent: #8b5cf6; --neon: #06b6d4; --text: #f1f5f9; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: radial-gradient(circle at top right, #1e1b4b, var(--bg)); background-attachment: fixed; color: var(--text); padding: 40px 20px; }
+        .ui-container { max-width: 950px; margin: auto; background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
+        h2 { text-align: center; font-weight: 800; margin-bottom: 30px; background: linear-gradient(to right, var(--neon), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card { background: rgba(255, 255, 255, 0.03); padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid #334155; border-radius: 10px; color: white; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--neon); outline: none; box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+        option { background: #0f172a; }
+        .course-row { display: grid; grid-template-columns: 1fr 2.5fr 100px; gap: 12px; margin-bottom: 12px; }
+        .btn { padding: 15px 30px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-add { background: #1e293b; color: white; border: 1px solid #334155; width: 100%; }
+        .btn-download { width: 100%; background: linear-gradient(45deg, var(--accent), var(--neon)); color: white; font-size: 18px; margin-top: 30px; }
+        .total-box { float: right; background: var(--accent); padding: 10px 20px; border-radius: 10px; font-weight: 800; margin-top: 10px; }
+        #pdf-wrapper { position: absolute; left: -5000px; top: 0; display: block; width: 8.5in; }
+        .pdf-page { width: 8.5in; height: 14in; background: white; color: black; padding: 0.3in 0.8in 0.5in 0.8in; font-family: 'Times New Roman', serif; box-sizing: border-box; line-height: 1.4; position: relative; }
+        .p-header { text-align: center; margin-bottom: 15px; }
+        .p-header h3 { font-size: 18px; font-weight: bold; margin: 4px 0; }
+        .p-header h4 { text-decoration: underline; font-size: 16px; margin: 4px 0; }
+        .p-dept { text-align: center; font-weight: bold; font-size: 17px; margin: 20px 0; }
+        .p-line { display: flex; align-items: baseline; margin: 10px 0; font-size: 15px; }
+        .p-dot { border-bottom: 1px dotted black; flex-grow: 1; min-height: 18px; margin-left: 5px; padding-left: 10px; }
+        .p-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .p-table th, .p-table td { border: 1px solid black; padding: 8px; text-align: center; font-size: 15px; }
+        .p-comment { margin-top: 35px; }
+        .p-comment-line { border-bottom: 1px dotted black; width: 100%; display: block; height: 25px; margin-top: 5px; }
+        .p-signs { margin-top: 80px; display: flex; justify-content: space-between; text-align: center; font-weight: bold; font-size: 14px; }
+        .p-signs div { width: 30%; }
+        .p-signs hr { border: 0; border-top: 1px solid black; margin-bottom: 8px; }
+        .p-footer { margin-top: 50px; }
+        .p-footer hr { border: 0; border-top: 1px solid black; margin: 10px 0 5px 0; }
+    </style>
+</head>
+<body>
+
+<div class="ui-container">
+    <h2>Course Registration </h2>
+
+    <div class="card">
+        <div class="grid">
+            <div class="field">
+                <label>Department Name</label>
+                <select id="dept-select" onchange="autoLoad()">
+                  <option value="">Department Name</option>
+                    <option value="Mechanical Engineering" selected>Mechanical Engineering</option>
+                    <option value="Chemical Engineering">Chemical Engineering</option>
+                    <option value="Electrical & Electronic Engineering">Electrical & Electronic Engineering</option>
+                    <option value="Computer Science Engineering">Computer Science Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Mechatronics Engineering">Mechatronics Engineering</option>
+                    <option value="Industrial & Production Engineering">Industrial & Production Engineering</option>
+                   <option value="Urban & Regional Planning Engineering">Urban & Regional Planning Engineering</option>
+                  <option value=" Electrical and Computer Engineering">Electrical and Computer Engineering</option>
+                  <option value="Electronics and Telecommunication Engineering ">Electronics and Telecommunication Engineering</option>
+                  <option value="Architecture Engineering">Architecture Engineering</option>
+                  <option value="Materials Science and Engineering">Materials Science and Engineering</option>
+                  <option value="Ceramic & Metallurgical Engineering">Ceramic & Metallurgical Engineering</option>
+                  <option value="Building Engineering & Construction Management ">Building Engineering & Construction Management </option>
+                  
+                </select>
+            </div>
+            <div class="field">
+                <label>Academic Session & Semester</label>
+                <select id="semester-select" onchange="autoLoad()">
+                    <option value="">-- Choose Semester --</option>
+                    <option value="1st Year Odd Semester">1st Year Odd Semester</option>
+                    <option value="1st Year Even Semester">1st Year Even Semester</option>
+                    <option value="2nd Year Odd Semester">2nd Year Odd Semester</option>
+                    <option value="2nd Year Even Semester">2nd Year Even Semester</option>
+                    <option value="3rd Year Odd Semester">3rd Year Odd Semester</option>
+                    <option value="3rd Year Even Semester">3rd Year Even Semester</option>
+                    <option value="4th Year Odd Semester">4th Year Odd Semester</option>
+                    <option value="4th Year Even Semester">4th Year Even Semester</option>
+                </select>
+            </div>
+            <div class="field"><label>Full Name</label><input type="text" id="name" placeholder="Full Name"></div>
+            <div class="field"><label>Roll Number</label><input type="text" id="roll" placeholder="Roll"></div>
+            <div class="field"><label>Reg No & Session</label><input type="text" id="reg" placeholder="Reg/Session"></div>
+            <div class="field"><label>Earned Credit</label><input type="text" id="prevCredit" placeholder="0.00"></div>
+        </div>
+        <div style="margin-top:15px"><label>Backlog Courses</label><input type="text" id="backlog" placeholder="Backlog Course Nos"></div>
+    </div>
+
+    <div class="card">
+        <div id="course-list"></div>
+        <button class="btn btn-add" onclick="addManual()">＋ Add Manual Course Row</button>
+        <div class="total-box">TOTAL: <span id="total-val">0.00</span></div>
+    </div>
+
+    <button class="btn btn-download" onclick="exportPDF()">DOWNLOAD PDF</button>
+</div>
+
+<div id="pdf-wrapper">
+    <div class="pdf-page" id="pdf-content">
+        <div class="p-header">
+            <p style="font-style: italic; font-size:14px">Heaven's Light is Our Guide</p>
+            <h3>RAJSHAHI UNIVERSITY OF ENGINEERING & TECHNOLOGY, BANGLADESH</h3>
+            <h4>Course Registration/Course Adjustment Form</h4>
+        </div>
+        <p class="p-dept"><span id="p-dept-v"></span> Department.</p>
+        <div class="p-line">Roll No. <span class="p-dot" id="p-roll-v"></span> Reg No. <span class="p-dot" id="p-reg-v"></span></div>
+        <div class="p-line">Name <span class="p-dot" id="p-name-v"></span></div>
+        <div class="p-line">Academic session & Semester <span class="p-dot" id="p-session-v"></span> Previously earned Credit <span class="p-dot" id="p-prevCredit-v"></span></div>
+        <div style="display:flex; border:1px solid black; margin:15px 0;">
+            <div style="width:30%; border-right:1px solid black; padding:10px; font-weight:bold; font-size:14px">Backlog courses</div>
+            <div style="width:70%; padding:10px; font-size:14px" id="p-backlog-v"></div>
+        </div>
+        <table class="p-table">
+            <thead><tr><th width="20%">Course No.</th><th width="65%">Course Name</th><th width="15%">Credit</th></tr></thead>
+            <tbody id="p-tbody"></tbody>
+            <tfoot><tr><td colspan="2" style="text-align:right; font-weight:bold; padding-right:15px">Total Credit</td><td id="p-total-v" style="font-weight:bold"></td></tr></tfoot>
+        </table>
+        <div class="p-comment">Adviser's Comment (if any) <span class="p-dot" style="width: 70%;"></span><span class="p-comment-line"></span></div>
+        <div class="p-signs"><div><hr>Signature of the Student</div><div><hr>Signature of the Adviser</div><div><hr>Signature of the Controller</div></div>
+        <div class="p-footer">
+            <p>Date: <span class="p-dot" style="width: 150px;"></span></p>
+            <hr><p style="font-size:12px">Students are asked to cross out the irrelevant Terms.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const db = {
+        "Mechanical Engineering": {
+            "1st Year Odd Semester": [
+                {no: "Chem 1121", title: "Chemistry", cr: 3.00},
+                {no: "Phy 1121", title: "Physics", cr: 3.00},
+                {no: "Hum 1121", title: "Economics and Sociology", cr: 3.00},
+                {no: "Math 1121", title: "Differential Calculus and Geometry", cr: 3.00},
+                {no: "ME 1101", title: "Basic Mechanical Engineering", cr: 3.00},
+                {no: "Chem 1122", title: "Chemistry Sessional", cr: 0.75},
+                {no: "Phy 1122", title: "Physics Sessional", cr: 0.75},
+                {no: "ME 1102", title: "Basic Mechanical Engineering Sessional", cr: 0.75},
+                {no: "ME 1100", title: "Mechanical Engineering Drawing", cr: 1.50},
+                {no: "MES 1108", title: "Shop Practice", cr: 0.75}
+            ],
+            "1st Year Even Semester": [
+                {no: "Hum 1221", title: "Technical English", cr: 3.00},
+                {no: "Math 1221", title: "Vector, Matrix and Integral Calculus", cr: 3.00},
+                {no: "CSE 1281", title: "Computer and Programming Language", cr: 3.00},
+                {no: "EEE 1281", title: "Electrical Circuits", cr: 3.00},
+                {no: "ME 1207", title: "Production Process", cr: 3.00},
+                {no: "Hum 1222", title: "Technical English Sessional", cr: 1.00},
+                {no: "CSE 1282", title: "Computer and Programming Language Sessional", cr: 1.50},
+                {no: "EEE 1282", title: "Electrical Circuits Sessional", cr: 0.75},
+                {no: "ME 1208", title: "Production Process Sessional", cr: 1.50}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "Hum 2121", title: "Accounting and Industrial law", cr: 3.00},
+                {no: "Math 2121", title: "Differential Equation, Complex variable and harmonic Analysis", cr: 4.00},
+                {no: "ME 2101", title: "Thermodynamics", cr: 3.00},
+                {no: "ME 2103", title: "Engineering Mechanics-I", cr: 3.00},
+                {no: "ME 2105", title: "Fluid Mechanics-I", cr: 3.00},
+                {no: "ME 2102", title: "Thermodynamics Sessional", cr: 1.50},
+                {no: "ME 2106", title: "Fluid Mechanics-I Sessional", cr: 1.50},
+                {no: "ME 2100", title: "Computer Aided Drawing", cr: 1.50}
+            ],
+            "2nd Year Even Semester": [
+                {no: "Math 2221", title: "Numerical Analysis and statistics", cr: 3.00},
+                {no: "EEE 2281", title: "Electrical Machines and Electronics", cr: 3.00},
+                {no: "ME 2203", title: "Engineering Mechanics-II", cr: 3.00},
+                {no: "ME 2207", title: "Measurement, Quality Control and Materials Handling", cr: 3.00},
+                {no: "ME 2209", title: "Mechanics of Solids", cr: 3.00},
+                {no: "EEE 2282", title: "Electrical Machines and Electronics Sessional", cr: 1.50},
+                {no: "Math 2222", title: "Numerical Analysis and statistics Sessional", cr: 0.75},
+                {no: "ME 2204", title: "Engineering Mechanics Sessional", cr: 1.50},
+                {no: "ME 2208", title: "Measurement, Quality Control and Materials Handling Sessional", cr: 0.75},
+                {no: "ME 2210", title: "Mechanics of Solids Sessional", cr: 0.75}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "ME 3101", title: "Heat Transfer-I", cr: 3.00},
+                {no: "ME 3105", title: "Fluid Mechanics-II", cr: 3.00},
+                {no: "ME 3109", title: "Design of Machine Elements-I", cr: 3.00},
+                {no: "ME 3115", title: "Instrumentation and Control", cr: 3.00},
+                {no: "ME 3119", title: "Engineering Materials and Metallurgy", cr: 4.00},
+                {no: "ME 3106", title: "Fluid Mechanics-II Sessional", cr: 0.75},
+                {no: "ME 3110", title: "Design of Machine Elements-I Sessional", cr: 0.75},
+                {no: "ME 3116", title: "Instrumentation and Control Sessional", cr: 0.75},
+                {no: "ME 3120", title: "Engineering Materials and Metallurgy Sessional", cr: 0.75},
+                {no: "ME 3114", title: "CFD Sessional", cr: 0.75}
+            ],
+            "3rd Year Even Semester": [
+                {no: "ME 3201", title: "Heat Transfer-II", cr: 3.00},
+                {no: "ME 3203", title: "Machine Dynamics and Vibration", cr: 3.00},
+                {no: "ME 3209", title: "Design of Machine Elements-II", cr: 3.00},
+                {no: "ME 3213", title: "Optional-I", cr: 3.00},
+                {no: "ME 3215", title: "Basic Mechatronics Engineering", cr: 3.00},
+                {no: "ME 3202", title: "Heat Transfer-II Sessional", cr: 1.50},
+                {no: "ME 3204", title: "Machine Dynamics and Vibration Sessional", cr: 0.75},
+                {no: "ME 3210", title: "Design of Machine Elements-II Sessional", cr: 1.50},
+                {no: "ME 3200", title: "Case Study in Mechanical Engineering", cr: 1.00},
+                {no: "ME 3216", title: "Basic Mechatronics Engineering Sessional", cr: 0.75}
+            ],
+            "4th Year Odd Semester": [
+                {no: "ME 4101", title: "Applied Thermodynamics-I", cr: 3.00},
+                {no: "ME 4111", title: "Refrigeration and Mechanical Equipment in Buildings", cr: 3.00},
+                {no: "ME 4117", title: "Production Planning and Control", cr: 3.00},
+                {no: "ME 4121", title: "Power Plant Engineering", cr: 3.00},
+                {no: "ME 4113", title: "Optional-II", cr: 3.00},
+                {no: "ME 4102", title: "Applied Thermodynamics-I Sessional", cr: 0.75},
+                {no: "ME 4112", title: "Refrigeration and Mechanical Equipment in Buildings Sessional", cr: 0.75},
+                {no: "ME 4100", title: "Project and Thesis", cr: 1.50},
+                {no: "ME 4110", title: "Seminar", cr: 1.00},
+                {no: "ME 4120", title: "Industrial Training", cr: 1.00}
+            ],
+            "4th Year Even Semester": [
+                {no: "ME 4201", title: "Applied Thermodynamics-II", cr: 3.00},
+                {no: "ME 4205", title: "Fluid Machinery", cr: 3.00},
+                {no: "ME 4207", title: "Machine Tools and Tool Design", cr: 3.00},
+                {no: "ME 4217", title: "Industrial Management", cr: 3.00},
+                {no: "ME 4213 (a)", title: "Automobile Engineering", cr: 3.00},
+                {no: "ME 4206", title: "Fluid Machinery Sessional", cr: 0.75},
+                {no: "ME 4208", title: "Machine Tools and Tool Design Sessional", cr: 0.75},
+                {no: "ME 4200", title: "Project and Thesis", cr: 3.00},
+                {no: "ME 4210", title: "Seminar", cr: 1.00}
+            ]
+        },
+      "Electrical & Electronic Engineering": {
+            "1st Year Odd Semester": [
+                {no: "EEE 1101", title: "Electrical Circuit I", cr: 3.00},
+                {no: "EEE 1102", title: "Electrical Circuit I Sessional", cr: 1.50},
+                {no: "CSE 1111", title: "Computer Programming", cr: 3.00},
+                {no: "CSE 1112", title: "Computer Programming Sessional", cr: 1.50},
+                {no: "Math 1101", title: "Engg. Mathematics I", cr: 3.00},
+                {no: "Phy 1111", title: "Physics", cr: 3.00},
+                {no: "Phy 1112", title: "Physics Sessional", cr: 0.75},
+                {no: "Hum 1111", title: "Technical English", cr: 3.00},
+                {no: "Hum 1112", title: "Technical English Sessional", cr: 0.75}
+            ],
+            "1st Year Even Semester": [
+                {no: "EEE 1201", title: "Electrical Circuit II", cr: 3.00},
+                {no: "EEE 1202", title: "Electrical Circuit II Sessional", cr: 0.75},
+                {no: "EEE 1203", title: "Electronics I", cr: 3.00},
+                {no: "EEE 1204", title: "Electronics I Sessional", cr: 1.50},
+                {no: "Chem 1111", title: "Chemistry", cr: 3.00},
+                {no: "Chem 1112", title: "Chemistry Sessional", cr: 0.75},
+                {no: "Hum 1211", title: "Financial Account & Economic Analysis", cr: 3.00},
+                {no: "Math 1201", title: "Engg. Mathematics II", cr: 3.00},
+                {no: "ME 1200", title: "Engineering Drawing", cr: 1.50}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "EEE 2100", title: "Electrical Shop Practice", cr: 1.50},
+                {no: "EEE 2103", title: "Electronics II", cr: 3.00},
+                {no: "EEE 2104", title: "Electronics II Sessional", cr: 1.50},
+                {no: "EEE 2105", title: "Electrical Machine I", cr: 3.00},
+                {no: "EEE 2106", title: "Electrical Machine I Sessional", cr: 1.50},
+                {no: "Math 2101", title: "Engg. Mathematics III", cr: 3.00},
+                {no: "ME 2101", title: "Basic Mechanical Engineering", cr: 3.00},
+                {no: "ME 2102", title: "Basic Mechanical Engineering Sessional", cr: 0.75},
+                {no: "IPE 2111", title: "Legal Issues and Management for Engineers", cr: 3.00}
+            ],
+            "2nd Year Even Semester": [
+                {no: "Math 2201", title: "Engg. Mathematics IV", cr: 3.00},
+                {no: "EEE 2203", title: "Electronics III", cr: 3.00},
+                {no: "EEE 2204", title: "Electronics III Sessional", cr: 1.50},
+                {no: "EEE 2205", title: "Electrical Machine II", cr: 3.00},
+                {no: "EEE 2206", title: "Electrical Machine II Sessional", cr: 1.50},
+                {no: "EEE 2211", title: "Measurement & Instrumentation", cr: 3.00},
+                {no: "EEE 2212", title: "Measurement & Instrumentation Sessional", cr: 1.50},
+                {no: "EEE 2213", title: "Digital Electronics I", cr: 3.00},
+                {no: "EEE 2214", title: "Digital Electronics I Sessional", cr: 0.75}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "EEE 3100", title: "Electronic Shop Practice", cr: 1.50},
+                {no: "EEE 3101", title: "Signals and Linear Systems", cr: 3.00},
+                {no: "EEE 3105", title: "Control Systems", cr: 3.00},
+                {no: "EEE 3106", title: "Control Systems Sessional", cr: 0.75},
+                {no: "EEE 3107", title: "Electromagnetic Fields & Waves", cr: 3.00},
+                {no: "EEE 3109", title: "Computational Methods in Electrical Engineering", cr: 3.00},
+                {no: "EEE 3110", title: "Computational Methods in Electrical Engineering Sessional", cr: 1.50},
+                {no: "EEE 3117", title: "Communication Engineering I", cr: 3.00},
+                {no: "EEE 3118", title: "Communication Engineering I Sessional", cr: 0.75}
+            ],
+            "3rd Year Even Semester": [
+                {no: "EEE 3200", title: "Electrical and Electronic Circuit Simulation Lab", cr: 1.50},
+                {no: "EEE 3203", title: "Power Electronics", cr: 3.00},
+                {no: "EEE 3204", title: "Power Electronics Sessional", cr: 0.75},
+                {no: "EEE 3205", title: "Power Plant Engineering and Economy", cr: 3.00},
+                {no: "EEE 3209", title: "Microprocessor, Interfacing and System Design", cr: 3.00},
+                {no: "EEE 3210", title: "Microprocessor, Interfacing and System Design Sessional", cr: 1.50},
+                {no: "EEE 3211", title: "Power System I", cr: 3.00},
+                {no: "EEE 3212", title: "Power System I Sessional", cr: 1.50},
+                {no: "EEE 3217", title: "Communication Engineering II", cr: 3.00},
+                {no: "EEE 3218", title: "Communication Engineering II Sessional", cr: 0.75}
+            ],
+            "4th Year Odd Semester": [
+                {no: "EEE 4000", title: "Project & Thesis", cr: 1.50},
+                {no: "EEE 4100", title: "Industrial Training", cr: 1.00},
+                {no: "EEE 4107", title: "Digital Signal Processing", cr: 3.00},
+                {no: "EEE 4108", title: "Digital Signal Processing Sessional", cr: 0.75},
+                {no: "EEE 4117", title: "Radio and TV Engineering", cr: 3.00},
+                {no: "EEE 4118", title: "Radio and TV Engineering Sessional", cr: 0.75},
+                {no: "IPE 4111", title: "Project and Operations Management", cr: 2.00},
+                {no: "EEE ****", title: "Elective I", cr: 3.00},
+                {no: "EEE ****", title: "Elective I Sessional", cr: 0.75},
+                {no: "EEE ****", title: "Elective II", cr: 3.00},
+                {no: "EEE ****", title: "Elective II Sessional", cr: 0.75}
+            ],
+            "4th Year Even Semester": [
+                {no: "EEE 4000", title: "Project & Thesis", cr: 3.00},
+                {no: "EEE 4200", title: "Seminar", cr: 1.00},
+                {no: "EEE 4209", title: "Embedded System Design", cr: 3.00},
+                {no: "EEE 4210", title: "Embedded System design Sessional", cr: 0.75},
+                {no: "EEE 4217", title: "Mobile Cellular Communication", cr: 3.00},
+                {no: "EEE ****", title: "Elective III", cr: 3.00},
+                {no: "EEE ****", title: "Elective III Sessional", cr: 0.75},
+                {no: "EEE ****", title: "Elective IV", cr: 3.00},
+                {no: "EEE ****", title: "Elective V", cr: 3.00}
+            ]
+        },
+      "Civil Engineering": {
+            "1st Year Odd Semester": [
+                {no: "CE 1101", title: "Surveying", cr: 4.00},
+                {no: "Chem 1101", title: "Chemistry", cr: 3.00},
+                {no: "Phy 1101", title: "Physics-I", cr: 3.00},
+                {no: "Math 1101", title: "Mathematics-I", cr: 3.00},
+                {no: "Hum 1101", title: "English", cr: 2.00},
+                {no: "CE 1100", title: "Civil Engineering Drawing", cr: 1.50},
+                {no: "MES 1132", title: "Mechanical Engineering Shops", cr: 1.50},
+                {no: "Chem 1102", title: "Chemistry Sessional", cr: 1.50},
+                {no: "Hum 1102", title: "Developing English Language Skills", cr: 1.50}
+            ],
+            "1st Year Even Semester": [
+                {no: "CE 1201", title: "Engineering Mechanics", cr: 4.00},
+                {no: "EEE 1241", title: "Basic Electrical Engineering", cr: 3.00},
+                {no: "Hum 1201", title: "Bangladesh Studies", cr: 2.00},
+                {no: "Phy 1201", title: "Physics-II", cr: 3.00},
+                {no: "Math 1201", title: "Mathematics-II", cr: 3.00},
+                {no: "CE 1202", title: "Practical Surveying", cr: 1.50},
+                {no: "CE 1200", title: "Computer Aided Drafting", cr: 1.50},
+                {no: "Phy 1202", title: "Physics Sessional", cr: 1.50}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "CE 2103", title: "Engineering Materials", cr: 4.00},
+                {no: "CE 2111", title: "Mechanics of Materials-I", cr: 3.00},
+                {no: "CE 2121", title: "Fluid Mechanics", cr: 4.00},
+                {no: "Math 2101", title: "Mathematics -III", cr: 3.00},
+                {no: "Hum 2101", title: "Sociology & Government", cr: 2.00},
+                {no: "CE 2104", title: "Engineering Materials Sessional", cr: 1.50},
+                {no: "CE 2110", title: "Details of Construction", cr: 1.50},
+                {no: "CE 2122", title: "Fluid Mechanics Sessional", cr: 1.50}
+            ],
+            "2nd Year Even Semester": [
+                {no: "CE 2201", title: "Numerical Methods & Computer Programming", cr: 4.00},
+                {no: "CE 2203", title: "Engineering Geology and Geomorphology", cr: 2.00},
+                {no: "CE 2213", title: "Mechanics of Materials-II", cr: 3.00},
+                {no: "Math 2201", title: "Mathematics - IV", cr: 3.00},
+                {no: "Hum 2201", title: "Accounting & Economics", cr: 2.00},
+                {no: "Hum 2203", title: "Principles of Management", cr: 2.00},
+                {no: "CE 2202", title: "Numerical Methods & Computer Programming Sessional", cr: 1.50},
+                {no: "CE 2214", title: "Mechanics of Materials Sessional", cr: 1.50},
+                {no: "CE 2220", title: "Details of Estimating", cr: 1.50},
+                {no: "CE 2252", title: "Planning, Architecture and Engineering Systems", cr: 1.50}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "CE 3111", title: "Structural Analysis & Design", cr: 4.00},
+                {no: "CE 3115", title: "Reinforced Concrete-I", cr: 3.00},
+                {no: "CE 3121", title: "Engineering Hydraulics", cr: 3.00},
+                {no: "CE 3131", title: "Geotechnical Engineering-I", cr: 3.00},
+                {no: "CE 3141", title: "Environmental Engineering-I", cr: 3.00},
+                {no: "CE 3112", title: "Structural Analysis & Design Sessional-I", cr: 1.50},
+                {no: "CE 3122", title: "Engineering Hydraulics Sessional", cr: 1.50},
+                {no: "CE 3132", title: "Geotechnical Engineering Sessional-I", cr: 1.50},
+                {no: "CE 3142", title: "Environmental Engineering Sessional-I", cr: 1.50}
+            ],
+            "3rd Year Even Semester": [
+                {no: "CE 3221", title: "Hydrology, Irrigation and Flood Management", cr: 3.00},
+                {no: "CE 3213", title: "Design of Steel Structures", cr: 3.00},
+                {no: "CE 3217", title: "Reinforced Concrete-II", cr: 3.00},
+                {no: "CE 3233", title: "Geotechnical Engineering-II", cr: 3.00},
+                {no: "CE 3205", title: "Transportation Engineering-I: Traffic Engineering", cr: 3.00},
+                {no: "CE 3218", title: "Reinforced Concrete Sessional-II", cr: 1.50},
+                {no: "CE 3234", title: "Geotechnical Engineering Sessional-II", cr: 1.50},
+                {no: "CE 3222", title: "Water Resources Engineering Sessional", cr: 1.50}
+            ],
+            "4th Year Odd Semester": [
+                {no: "CE 4111", title: "Analysis of Indeterminate Structures", cr: 3.00},
+                {no: "CE 4101", title: "Professional Ethics and Practices", cr: 3.00},
+                {no: "CE 4131", title: "Foundation Engineering", cr: 3.00},
+                {no: "CE 4141", title: "Environmental Engineering-II", cr: 3.00},
+                {no: "CE 4105", title: "Railway and Pavement Engineering", cr: 2.00},
+                {no: "CE 4112", title: "Structural Analysis & Design Sessional-III", cr: 1.50},
+                {no: "CE 4132", title: "Geotechnical Engineering Sessional-III", cr: 1.50},
+                {no: "CE 4106", title: "Transportation Engineering Sessional", cr: 1.50},
+                {no: "CE 4000", title: "Thesis", cr: 0.00},
+                {no: "CE 4004", title: "Capstone Project & Internship/Industrial", cr: 1.50}
+            ],
+            "4th Year Even Semester": [
+                {no: "CE 4211", title: "Structural Analysis & Design-III", cr: 3.00},
+                {no: "CE 4221", title: "Water Resources Engineering-III", cr: 3.00}
+                // বাকিগুলো একইভাবে ছবির ডাটা অনুযায়ী বসানো যাবে
+            ]
+        },
+      "Computer Science Engineering": {
+            "1st Year Odd Semester": [
+                {no: "CSE 1100", title: "Computer Fundamentals and Ethics Sessional", cr: 0.75},
+                {no: "CSE 1101", title: "Structured Programming", cr: 3.00},
+                {no: "CSE 1102", title: "Structured Programming Sessional", cr: 1.50},
+                {no: "EEE 1151", title: "Basic Electrical Engineering", cr: 3.00},
+                {no: "EEE 1152", title: "Basic Electrical Engineering Sessional", cr: 0.75},
+                {no: "Math 1113", title: "Differential and Integral Calculus", cr: 3.00},
+                {no: "Hum 1113", title: "Functional English", cr: 3.00},
+                {no: "Hum 1114", title: "Functional English Sessional", cr: 0.75},
+                {no: "Chem 1113", title: "Inorganic and Physical Chemistry", cr: 3.00},
+                {no: "Chem 1114", title: "Inorganic and Physical Chemistry Sessional", cr: 0.75}
+            ],
+            "1st Year Even Semester": [
+                {no: "CSE 1200", title: "Competitive Programming Sessional", cr: 0.75},
+                {no: "CSE 1201", title: "Data Structure", cr: 3.00},
+                {no: "CSE 1202", title: "Data Structure Sessional", cr: 1.50},
+                {no: "CSE 1203", title: "Object Oriented Programming", cr: 3.00},
+                {no: "CSE 1204", title: "Object Oriented Programming Sessional", cr: 1.50},
+                {no: "EEE 1251", title: "Electronic Devices and Circuits", cr: 3.00},
+                {no: "EEE 1252", title: "Electronic Devices and Circuits Sessional", cr: 1.50},
+                {no: "Math 1213", title: "Coordinate Geometry and Ordinary Differential Equation", cr: 3.00},
+                {no: "Phy 1213", title: "Physics", cr: 3.00},
+                {no: "Phy 1214", title: "Physics Sessional", cr: 0.75}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "CSE 2100", title: "Software Development Project I", cr: 0.75},
+                {no: "CSE 2101", title: "Discrete Mathematics", cr: 3.00},
+                {no: "CSE 2102", title: "Discrete Mathematics Sessional", cr: 1.50},
+                {no: "CSE 2103", title: "Digital Logic Design", cr: 3.00},
+                {no: "CSE 2104", title: "Digital Logic Design Sessional", cr: 1.50},
+                {no: "EEE 2151", title: "Electrical Drives and Instrumentations", cr: 3.00},
+                {no: "EEE 2152", title: "Electrical Drives and Instrumentations Sessional", cr: 0.75},
+                {no: "Math 2113", title: "Vector Analysis and Linear Algebra", cr: 3.00},
+                {no: "Hum 2113", title: "Government and Sociology Economics", cr: 3.00}
+            ],
+            "2nd Year Even Semester": [
+                {no: "CSE 2200", title: "Technical Writing and Presentation Sessional", cr: 0.75},
+                {no: "CSE 2201", title: "Algorithm Analysis and Design", cr: 3.00},
+                {no: "CSE 2202", title: "Algorithm Analysis and Design Sessional", cr: 1.50},
+                {no: "CSE 2203", title: "Numerical Methods", cr: 3.00},
+                {no: "CSE 2204", title: "Numerical Methods Sessional", cr: 0.75},
+                {no: "CSE 2205", title: "Microprocessors, Microcontrollers and Assembly Language", cr: 3.00},
+                {no: "CSE 2206", title: "Microprocessors, Microcontrollers and Assembly Language Sessional", cr: 1.50},
+                {no: "Math 2213", title: "Complex Variable, Partial Differential Equation and Harmonic Analysis", cr: 3.00},
+                {no: "Hum 2213", title: "Industrial Management and Accountancy", cr: 3.00}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "CSE 3100", title: "Web Based Application Project", cr: 0.75},
+                {no: "CSE 3101", title: "Database Systems", cr: 3.00},
+                {no: "CSE 3102", title: "Database Systems Sessional", cr: 1.50},
+                {no: "CSE 3103", title: "Theory of Computation", cr: 3.00},
+                {no: "CSE 3105", title: "Computer Interfacing and Embedded System", cr: 3.00},
+                {no: "CSE 3106", title: "Computer Interfacing and Embedded System Sessional", cr: 0.75},
+                {no: "CSE 3107", title: "Computer Architecture", cr: 3.00},
+                {no: "CSE 3108", title: "Computer Architecture Sessional", cr: 0.75},
+                {no: "CSE 3109", title: "Applied Statistics and Queuing Theory", cr: 3.00}
+            ],
+            "3rd Year Even Semester": [
+                {no: "CSE 3200", title: "Software Development Project II", cr: 0.75},
+                {no: "CSE 3201", title: "Operating Systems", cr: 3.00},
+                {no: "CSE 3202", title: "Operating Systems Sessional", cr: 0.75},
+                {no: "CSE 3203", title: "Data Communication", cr: 3.00},
+                {no: "CSE 3204", title: "Data Communication Sessional", cr: 0.75},
+                {no: "CSE 3205", title: "Software Engineering", cr: 3.00},
+                {no: "CSE 3206", title: "Software Engineering Sessional", cr: 0.75},
+                {no: "CSE 3207", title: "Artificial Intelligence", cr: 3.00},
+                {no: "CSE 3208", title: "Artificial Intelligence Sessional", cr: 0.75},
+                {no: "CSE 3209", title: "Digital Signal Processing", cr: 3.00},
+                {no: "CSE 3210", title: "Digital Signal Processing Sessional", cr: 0.75}
+            ],
+            "4th Year Odd Semester": [
+                {no: "CSE 4000", title: "Project/Thesis I", cr: 1.00},
+                {no: "CSE 4101", title: "Compiler Design", cr: 3.00},
+                {no: "CSE 4102", title: "Compiler Design Sessional", cr: 0.75},
+                {no: "CSE 4103", title: "Computer Networks", cr: 3.00},
+                {no: "CSE 4104", title: "Computer Networks Sessional", cr: 1.50},
+                {no: "CSE 4105", title: "Digital Image Processing", cr: 3.00},
+                {no: "CSE 4106", title: "Digital Image Processing Sessional", cr: 0.75},
+                {no: "CSE 4108", title: "Industrial Attachment", cr: 0.75}
+            ],
+            "4th Year Even Semester": [
+                {no: "CSE 4000", title: "Project/Thesis II", cr: 3.00},
+                {no: "CSE 4201", title: "Computer Graphics", cr: 3.00},
+                {no: "CSE 4202", title: "Computer Graphics Sessional", cr: 0.75},
+                {no: "CSE 4203", title: "Machine Learning", cr: 3.00},
+                {no: "CSE 4204", title: "Machine Learning Sessional", cr: 0.75},
+                {no: "CSE 4205", title: "Security and Privacy", cr: 3.00},
+                {no: "CSE 4206", title: "Security and Privacy Sessional", cr: 0.75},
+                {no: "CSE 4208", title: "Seminar", cr: 0.75}
+            ]
+        },
+      "Electrical and Computer Engineering": {
+            "1st Year Odd Semester": [
+                {no: "ECE 1101", title: "Circuits and Systems-I", cr: 3.00},
+                {no: "ECE 1102", title: "Circuits and Systems-I Sessional", cr: 1.50},
+                {no: "ECE 1103", title: "Computer Programming", cr: 3.00},
+                {no: "ECE 1104", title: "Computer Programming Sessional", cr: 1.50},
+                {no: "Math 1117", title: "Calculus and Ordinary Differential Equation", cr: 3.00},
+                {no: "Phy 1117", title: "Optics and Modern Physics", cr: 3.00},
+                {no: "Phy 1118", title: "Optics and Modern Physics Sessional", cr: 0.75},
+                {no: "Hum 1117", title: "Technical English", cr: 3.00},
+                {no: "Hum 1118", title: "Technical English Sessional", cr: 0.75},
+                {no: "ECE 1100", title: "Introduction to Computer System", cr: 0.75}
+            ],
+            "1st Year Even Semester": [
+                {no: "ECE 1201", title: "Circuits and Systems II", cr: 3.00},
+                {no: "ECE 1202", title: "Circuits and Systems II Sessional", cr: 0.75},
+                {no: "ECE 1203", title: "Analog Electronics", cr: 3.00},
+                {no: "ECE 1204", title: "Analog Electronics Sessional", cr: 1.50},
+                {no: "ECE 1205", title: "Data Structures", cr: 3.00},
+                {no: "ECE 1206", title: "Data Structures Sessional", cr: 0.75},
+                {no: "Math 1217", title: "Coordinate Geometry and Statistics", cr: 3.00},
+                {no: "Hum 1217", title: "Government and Sociology", cr: 3.00},
+                {no: "ECE 1306", title: "Engineering Ethics", cr: 3.00}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "ECE 2101", title: "Algorithms", cr: 3.00},
+                {no: "ECE 2102", title: "Algorithms Sessional", cr: 1.50},
+                {no: "ECE 2103", title: "Digital Electronics", cr: 3.00},
+                {no: "ECE 2104", title: "Digital Electronics Sessional", cr: 0.75},
+                {no: "ECE 2111", title: "Thermodynamics", cr: 3.00},
+                {no: "ECE 2112", title: "Thermodynamics Sessional", cr: 0.75},
+                {no: "Math 2117", title: "Vector Analysis and Linear Algebra", cr: 3.00},
+                {no: "Chem 2117", title: "Physical and Inorganic Chemistry", cr: 3.00},
+                {no: "Chem 2118", title: "Physical and Inorganic Chemistry Sessional", cr: 0.75},
+                {no: "ECE 2100", title: "Project-I", cr: 0.75}
+            ],
+            "2nd Year Even Semester": [
+                {no: "ECE 2207", title: "Electrical Machines", cr: 3.00},
+                {no: "ECE 2208", title: "Electrical Machines Sessional", cr: 0.75},
+                {no: "ECE 2213", title: "Numerical Methods and Discrete Math", cr: 3.00},
+                {no: "ECE 2214", title: "Numerical Methods and Discrete Math Sessional", cr: 1.50},
+                {no: "ECE 2215", title: "Database Systems", cr: 3.00},
+                {no: "ECE 2216", title: "Database Systems Sessional", cr: 1.50},
+                {no: "Math 2217", title: "Vector Analysis & Laplace Transforms", cr: 3.00},
+                {no: "Hum 2217", title: "Industrial Management", cr: 3.00},
+                {no: "ECE 2200", title: "Electronic Shop Practice", cr: 1.50}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "ECE 3111", title: "Microprocessors and Interfacing", cr: 3.00},
+                {no: "ECE 3112", title: "Microprocessors and Interfacing Sessional", cr: 1.50},
+                {no: "ECE 3117", title: "Software Engineering", cr: 3.00},
+                {no: "ECE 3118", title: "Software Engineering Sessional", cr: 0.75},
+                {no: "ECE 3119", title: "Signals and Systems", cr: 3.00},
+                {no: "ECE 3100", title: "Engineering Drawing", cr: 0.75}
+            ],
+            "3rd Year Even Semester": [
+                {no: "ECE 3207", title: "Communication Engineering", cr: 3.00},
+                {no: "ECE 3208", title: "Communication Engineering Sessional", cr: 0.75},
+                {no: "ECE 3222", title: "Operating Systems Sessional", cr: 0.75},
+                {no: "ME 3219", title: "Basic Mechanical Engineering", cr: 3.00},
+                {no: "ECE 3200", title: "Integrated Circuit Design", cr: 1.50}
+            ],
+            "4th Year Odd Semester": [
+                {no: "ECE 4119", title: "Power Systems", cr: 3.00},
+                {no: "ECE 4117", title: "Control Systems and Robotics", cr: 3.00},
+                {no: "ECE 4118", title: "Control Systems and Robotics Sessional", cr: 0.75},
+                {no: "ECE 4123", title: "Digital Signal Processing", cr: 3.00},
+                {no: "ECE 4124", title: "Digital Signal Processing Sessional", cr: 0.75},
+                {no: "ECE 4000", title: "Thesis I", cr: 1.00},
+                {no: "ECE 4100", title: "Industrial Training", cr: 0.75},
+                {no: "ECE 4125", title: "Seminar", cr: 0.75}
+            ],
+            "4th Year Even Semester": [
+                {no: "ECE 4209", title: "Computer Networks", cr: 3.00},
+                {no: "ECE 4210", title: "Computer Networks Sessional", cr: 0.75},
+                {no: "ECE 4223", title: "Digital Image Processing", cr: 3.00},
+                {no: "ECE 4224", title: "Digital Image Processing Sessional", cr: 1.50},
+                {no: "ECE 4000", title: "Thesis II", cr: 3.00}
+            ]
+        },
+        "Mechatronics Engineering": {
+            "1st Year Odd Semester": [
+                {no: "MTE 1101", title: "Mechatronic Systems", cr: 3.00},
+                {no: "Math 1127", title: "Calculus and Solid Geometry", cr: 3.00},
+                {no: "Phy 1127", title: "Physics", cr: 3.00},
+                {no: "Chem 1127", title: "Chemistry", cr: 3.00},
+                {no: "Hum 1127", title: "Engineering Ethics", cr: 3.00},
+                {no: "ME 1130", title: "Engineering Graphics", cr: 1.50},
+                {no: "MTE 1102", title: "Mechatronic Systems Sessional", cr: 0.75},
+                {no: "Phy 1128", title: "Physics Sessional", cr: 0.75},
+                {no: "Chem 1128", title: "Chemistry Sessional", cr: 0.75}
+            ],
+            "1st Year Even Semester": [
+                {no: "ME 1255", title: "Thermodynamics and Heat Transfer", cr: 3.00},
+                {no: "EEE 1287", title: "Electrical Circuits", cr: 3.00},
+                {no: "CSE 1287", title: "Computer Fundamentals & Programming", cr: 3.00},
+                {no: "Math 1227", title: "Vector, Matrix and ODE", cr: 3.00},
+                {no: "Hum 1227", title: "Technical English", cr: 3.00},
+                {no: "ME 1256", title: "Thermodynamics and Heat Transfer Sessional", cr: 0.75},
+                {no: "EEE 1288", title: "Electrical Circuits Sessional", cr: 1.50},
+                {no: "CSE 1288", title: "Computer Fundamentals & Programming Sessional", cr: 1.50},
+                {no: "Hum 1228", title: "English Language Skills Sessional", cr: 0.75}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "IPE 2101", title: "Engineering Economy", cr: 2.00},
+                {no: "IPE 2113", title: "Engineering Materials and Metallurgy", cr: 4.00},
+                {no: "Math 2123", title: "Engineering Mathematics-III", cr: 4.00},
+                {no: "Hum 2123", title: "Technical English and Sociology", cr: 3.00},
+                {no: "ME 2161", title: "Engineering Mechanics and Theory of Machines", cr: 4.00},
+                {no: "IPES 2102", title: "Shop Practice", cr: 0.75},
+                {no: "IPE 2114", title: "Engineering Materials Lab", cr: 0.75},
+                {no: "BME 2152", title: "Thermodynamics Lab", cr: 1.50}
+            ],
+            "2nd Year Even Semester": [
+                {no: "IPE 2201", title: "Organizational Behavior", cr: 2.00},
+                {no: "IPE 2203", title: "Probability and Statistics", cr: 4.00},
+                {no: "IPE 2211", title: "Production Process-I", cr: 3.00},
+                {no: "ME 2251", title: "Mechanics of Solids", cr: 4.00},
+                {no: "CSE 2283", title: "Introduction to Computer Programming", cr: 3.00},
+                {no: "IPE 2212", title: "Production Process-I Lab", cr: 0.75},
+                {no: "Hum 2224", title: "English Language Practice", cr: 0.75},
+                {no: "ME 2252", title: "Solid Mechanics Lab", cr: 0.75},
+                {no: "CSE 2284", title: "Computer Programming Lab", cr: 1.00}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "IPE 3101", title: "Operations Management", cr: 3.00},
+                {no: "IPE 3103", title: "Operations Research", cr: 4.00},
+                {no: "IPE 3105", title: "Product Design-I", cr: 3.00},
+                {no: "IPE 3111", title: "Production Process-II", cr: 3.00},
+                {no: "IPE 3121", title: "Management Information System", cr: 3.00},
+                {no: "IPE 3106", title: "Product Design Lab", cr: 1.50},
+                {no: "IPE 3112", title: "Production Process Lab", cr: 0.75},
+                {no: "IPE 3122", title: "Programming Lab", cr: 0.75}
+            ],
+            "3rd Year Even Semester": [
+                {no: "IPE 3201", title: "Quality Control and Management", cr: 3.00},
+                {no: "IPE 3205", title: "Product Design-II", cr: 3.00},
+                {no: "IPE 3211", title: "Machine Tools", cr: 4.00},
+                {no: "Math 3223", title: "Engineering Mathematics-IV", cr: 4.00},
+                {no: "ME 3251", title: "Fluid Mechanics and Machinery", cr: 3.00},
+                {no: "IPE 3200", title: "IPE Case Study", cr: 1.00},
+                {no: "IPE 3206", title: "Product Design-II Lab", cr: 1.50},
+                {no: "IPE 3212", title: "Machine Tools Lab", cr: 0.75},
+                {no: "Math 3224", title: "Numerical Analysis Lab", cr: 0.75},
+                {no: "ME 3252", title: "Fluid Mechanics Lab", cr: 0.75}
+            ],
+            "4th Year Odd Semester": [
+                {no: "MTE 4101", title: "Automation", cr: 3.00},
+                {no: "MTE 4103", title: "DSP & Machine Vision", cr: 3.00},
+                {no: "MTE 4107", title: "Design of Mechatronic Systems", cr: 3.00},
+                {no: "IPE 4155", title: "Industrial Management", cr: 3.00},
+                {no: "MTE 4105", title: "Optional-I", cr: 3.00},
+                {no: "MTE 4100", title: "Project and Thesis I", cr: 1.50},
+                {no: "MTE 4110", title: "Seminar", cr: 1.00},
+                {no: "MTE 4102", title: "Automation Sessional", cr: 1.50},
+                {no: "MTE 4104", title: "Machine Vision Sessional", cr: 1.50},
+                {no: "MTE 4108", title: "Design Sessional", cr: 1.50}
+            ],
+            "4th Year Even Semester": [
+                {no: "MTE 4203", title: "Embedded Systems", cr: 3.00},
+                {no: "MTE 4205", title: "Robotics", cr: 3.00},
+                {no: "MTE 4207", title: "Computer Integrated Manufacturing", cr: 3.00},
+                {no: "CSE 4287", title: "Artificial Intelligence", cr: 3.00},
+                {no: "MTE 4209", title: "Optional-II", cr: 3.00},
+                {no: "MTE 4200", title: "Project and Thesis II", cr: 3.00},
+                {no: "MTE 4204", title: "Embedded Systems Sessional", cr: 0.75},
+                {no: "MTE 4206", title: "Robotics Sessional", cr: 1.50},
+                {no: "CSE 4288", title: "Artificial Intelligence sessional", cr: 0.75},
+                {no: "MTE 4210", title: "Seminar", cr: 1.00}
+            ]
+        },
+        "Materials Science and Engineering": {
+            "1st Year Odd Semester": [
+                {no: "Math 113", title: "Differentiation & Integral Calculus", cr: 3.00},
+                {no: "Hum 113", title: "Sociology", cr: 3.00},
+                {no: "ME 1101", title: "Basic Mechanical Engineering", cr: 3.00},
+                {no: "Phy 1132", title: "Physics Sessional", cr: 1.50},
+                {no: "ME 1180", title: "Engineering Graphics", cr: 1.50},
+                {no: "MSE 1101", title: "Introduction to Material Science", cr: 3.00}
+            ],
+            "1st Year Even Semester": [
+                {no: "CSE 1251", title: "Programming Language", cr: 3.00},
+                {no: "ME 1201", title: "Engineering Mechanics", cr: 3.00}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "Math 2130", title: "Numerical and Probability", cr: 3.00},
+                {no: "ME 2160", title: "Fluid and Machinery", cr: 1.50},
+                {no: "ME 2170", title: "Fluid Machinery Lab", cr: 0.75}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "MSE 3158", title: "Glass and Ceramics Engineering", cr: 3.00},
+                {no: "MSE 3131", title: "Surface Engineering", cr: 3.00},
+                {no: "MSE 3103", title: "Refractories and Furnaces", cr: 3.00},
+                {no: "MSE 3100", title: "Iron and Steel Making", cr: 3.00},
+                {no: "MSE 3141", title: "Metal Extraction and Refining", cr: 3.00},
+                {no: "MSE 3134", title: "Refractories Sessional", cr: 1.50}
+            ],
+            "3rd Year Even Semester": [
+                {no: "MSE 3213", title: "Corrosion and Degradation", cr: 2.00},
+                {no: "MSE 3331", title: "Foundry Engineering", cr: 3.00},
+                {no: "MSE 3330", title: "Metal Joining Technology", cr: 3.00},
+                {no: "MSE 3041", title: "Polymer Science", cr: 3.00},
+                {no: "MSE 3200", title: "Industrial Training", cr: 1.00}
+            ],
+            "4th Year Odd Semester": [
+                {no: "IPE 4159", title: "Industrial Management", cr: 3.00},
+                {no: "MSE 4131", title: "Physical Metallurgy & Heat Treatment", cr: 3.00},
+                {no: "MSE 4111", title: "Physical Properties", cr: 3.00},
+                {no: "MSE 4101", title: "Materials Characterization", cr: 3.00},
+                {no: "MSE 4132", title: "Heat Treatment Sessional", cr: 1.50}
+            ],
+            "4th Year Even Semester": [
+                {no: "IPE 4259", title: "Production Planning & Control", cr: 3.00},
+                {no: "MSE 4231", title: "Metallic Alloys", cr: 3.00},
+                {no: "MSE 4233", title: "Metal Working Process", cr: 3.00},
+                {no: "MSE 4243", title: "Powder Metallurgy", cr: 3.00},
+                {no: "MSE 4232", title: "Failure Analysis Sessional", cr: 1.50},
+                {no: "MSE 4200", title: "Project II", cr: 3.00}
+            ]
+        },
+        "Industrial & Production Engineering": {
+            "1st Year Odd Semester": [
+                {no: "Chem 1123", title: "Inorganic and Physical Chemistry", cr: 3.00},
+                {no: "Phy 1123", title: "Physics-I", cr: 3.00},
+                {no: "Math 1123", title: "Engineering Mathematics-I", cr: 4.00},
+                {no: "Hum 1123", title: "Economics", cr: 3.00},
+                {no: "EEE 1183", title: "Electrical Engineering-I", cr: 3.00},
+                {no: "IPE 1100", title: "Engineering Graphics-I", cr: 1.50},
+                {no: "Chem 1124", title: "Chemistry Lab", cr: 0.75},
+                {no: "Phy 1124", title: "Physics-I Lab", cr: 0.75},
+                {no: "EEE 1184", title: "Electrical Engineering Lab", cr: 1.50}
+            ],
+            "1st Year Even Semester": [
+                {no: "Chem 1223", title: "Industrial Chemistry", cr: 3.00},
+                {no: "Phy 1223", title: "Physics-II", cr: 3.00},
+                {no: "Math 1223", title: "Engineering Mathematics-II", cr: 3.00},
+                {no: "ME 1251", title: "Thermodynamics and Heat Transfer", cr: 4.00},
+                {no: "EEE 1283", title: "Electrical Engineering-II", cr: 3.00},
+                {no: "IPE 1200", title: "Engineering Graphics-II and CAD Lab", cr: 1.50},
+                {no: "IPES 1202", title: "Shop Practice-I", cr: 0.75},
+                {no: "Phy 1224", title: "Physics-II Lab", cr: 0.75},
+                {no: "EEE 1284", title: "Electrical Engineering Lab-II", cr: 1.50}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "IPE 2101", title: "Engineering Economy", cr: 2.00},
+                {no: "IPE 2113", title: "Engineering Materials and Metallurgy", cr: 4.00},
+                {no: "Math 2123", title: "Engineering Mathematics-III", cr: 4.00},
+                {no: "Hum 2123", title: "Technical English and Sociology", cr: 3.00},
+                {no: "ME 2161", title: "Engineering Mechanics and Theory of Machines", cr: 4.00},
+                {no: "IPES 2102", title: "Shop Practice", cr: 0.75},
+                {no: "IPE 2114", title: "Engineering Materials Lab", cr: 0.75},
+                {no: "ME 2152", title: "Thermodynamics Lab", cr: 1.50}
+            ],
+            "2nd Year Even Semester": [
+                {no: "IPE 2201", title: "Organizational Behavior", cr: 2.00},
+                {no: "IPE 2203", title: "Probability and Statistics", cr: 4.00},
+                {no: "IPE 2211", title: "Production Process-I", cr: 3.00},
+                {no: "ME 2251", title: "Mechanics of Solids", cr: 4.00},
+                {no: "CSE 2283", title: "Introduction to Computer Programming", cr: 3.00},
+                {no: "IPE 2212", title: "Production Process-I Lab", cr: 0.75},
+                {no: "Hum 2224", title: "English Language Practice", cr: 0.75},
+                {no: "ME 2252", title: "Solid Mechanics Lab", cr: 0.75},
+                {no: "CSE 2284", title: "Computer Programming Lab", cr: 1.00}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "IPE 3101", title: "Operations Management", cr: 3.00},
+                {no: "IPE 3103", title: "Operations Research", cr: 4.00},
+                {no: "IPE 3105", title: "Product Design-I", cr: 3.00},
+                {no: "IPE 3111", title: "Production Process-II", cr: 3.00},
+                {no: "IPE 3121", title: "Management Information system", cr: 3.00},
+                {no: "IPE 3106", title: "Product Design Lab", cr: 1.50},
+                {no: "IPE 3112", title: "Production Process Lab", cr: 0.75},
+                {no: "IPE 3122", title: "Programming Lab", cr: 0.75}
+            ],
+            "3rd Year Even Semester": [
+                {no: "IPE 3201", title: "Quality Control and Management", cr: 3.00},
+                {no: "IPE 3205", title: "Product Design-II", cr: 3.00},
+                {no: "IPE 3211", title: "Machine Tools", cr: 4.00},
+                {no: "Math 3223", title: "Engineering Mathematics-IV", cr: 4.00},
+                {no: "ME 3251", title: "Fluid Mechanics and Machinery", cr: 3.00},
+                {no: "IPE 3200", title: "IPE Case Study", cr: 1.00},
+                {no: "IPE 3206", title: "Product Design Lab-II", cr: 1.50},
+                {no: "IPE 3212", title: "Machine Tools Lab", cr: 0.75},
+                {no: "Math 3224", title: "Numerical Analysis Lab", cr: 0.75},
+                {no: "ME 3252", title: "Fluid Mechanics Lab", cr: 0.75}
+            ],
+            "4th Year Odd Semester": [
+                {no: "IPE 4100", title: "Project and Thesis I", cr: 1.50},
+                {no: "IPE 4101", title: "Industrial and Business Management", cr: 3.00},
+                {no: "IPE 4103", title: "Ergonomics and Safety Management", cr: 3.00},
+                {no: "IPE 4121", title: "Measurement and Instrumentation", cr: 3.00},
+                {no: "IPE 4123", title: "CAD/CAM", cr: 3.00},
+                {no: "IPE 4131", title: "Optional-I", cr: 3.00},
+                {no: "IPE 4104", title: "Safety Lab", cr: 0.75},
+                {no: "IPE 4122", title: "Instrumentation Lab", cr: 0.75},
+                {no: "IPE 4124", title: "CAD Lab", cr: 0.75},
+                {no: "IPE 4128", title: "Industrial Simulation Lab", cr: 1.50}
+            ],
+            "4th Year Even Semester": [
+                {no: "IPE 4200", title: "Project and Thesis II", cr: 3.00},
+                {no: "IPE 4201", title: "Project and Environmental Management", cr: 3.00},
+                {no: "IPE 4203", title: "Materials Handling and Maintenance Management", cr: 3.00},
+                {no: "IPE 4205", title: "Cost and Management Accounting", cr: 3.00},
+                {no: "IPE 4221", title: "Control Theory and Automation", cr: 3.00},
+                {no: "IPE 4231", title: "Optional-II", cr: 3.00},
+                {no: "IPE 4204", title: "Materials Handling Lab", cr: 0.75},
+                {no: "IPE 4222", title: "Control and Automation Lab", cr: 0.75},
+                {no: "IPE 4240", title: "Industrial Practice", cr: 1.00},
+                {no: "IPE 4242", title: "Engineering Communication Seminar", cr: 1.00}
+            ]
+        },
+        "Chemical Engineering": {
+            "1st Year Odd Semester": [
+                {no: "Chem 1129", title: "Chemistry I", cr: 3.00},
+                {no: "Phy 1129", title: "Physics", cr: 3.00},
+                {no: "Hum 1129", title: "Economics and Sociology", cr: 3.00},
+                {no: "Math 1129", title: "Differential Calculus and Geometry", cr: 3.00},
+                {no: "CFPE 1101", title: "Introduction to Chemical Engineering", cr: 3.00},
+                {no: "Chem 1130", title: "Chemistry I Sessional", cr: 0.75},
+                {no: "Phy 1130", title: "Physics Sessional", cr: 1.50},
+                {no: "ME 1140", title: "Engineering Drawing", cr: 1.50},
+                {no: "MES 1158", title: "Workshop Practice", cr: 1.50}
+            ],
+            "1st Year Even Semester": [
+                {no: "Chem 1229", title: "Chemistry II", cr: 3.00},
+                {no: "Hum 1229", title: "Technical English", cr: 3.00},
+                {no: "Math 1229", title: "Integral Calculus and Differential Equation", cr: 3.00},
+                {no: "EEE 1289", title: "Electrical Circuits", cr: 3.00},
+                {no: "CFPE 1211", title: "Introduction to Food Process Engineering", cr: 3.00},
+                {no: "Chem 1230", title: "Chemistry II Sessional", cr: 0.75},
+                {no: "Hum 1230", title: "Technical English Sessional", cr: 1.00},
+                {no: "EEE 1290", title: "Electrical Circuits Sessional", cr: 1.50},
+                {no: "CFPE 1200", title: "Introduction to Chemical and Food Process Engineering Sessional", cr: 1.50}
+            ],
+            "2nd Year Odd Semester": [
+                {no: "Math 2129", title: "Vector Analysis, Matrices and Laplace Transforms", cr: 3.00},
+                {no: "CFPE 2101", title: "Chemical Thermodynamics", cr: 3.00},
+                {no: "ME 2157", title: "Engineering Mechanics", cr: 3.00},
+                {no: "ME 2167", title: "Heat Transfer", cr: 3.00},
+                {no: "EEE 2189", title: "Electrical Machines and Electronics", cr: 3.00},
+                {no: "CFPE 2102", title: "Chemical Thermodynamics Sessional", cr: 1.50},
+                {no: "ME 2168", title: "Heat Transfer Sessional", cr: 1.50},
+                {no: "EEE 2190", title: "Electrical Machines and Electronics Sessional", cr: 1.50}
+            ],
+            "2nd Year Even Semester": [
+                {no: "Math 2229", title: "Numerical Analysis and Statistics", cr: 3.00},
+                {no: "CFPE 2211", title: "Principles of Food Processing and Preservation", cr: 3.00},
+                {no: "ME 2257", title: "Fluid Mechanics", cr: 3.00},
+                {no: "ME 2267", title: "Solid Mechanics", cr: 3.00},
+                {no: "CSE 2289", title: "Computer Programming and Applications", cr: 3.00},
+                {no: "Math 2230", title: "Numerical Analysis and Statistics Sessional", cr: 1.50},
+                {no: "ME 2258", title: "Fluid Mechanics Sessional", cr: 1.50},
+                {no: "ME 2268", title: "Solid Mechanics Sessional", cr: 0.75},
+                {no: "CSE 2290", title: "Computer Programming and Applications Sessional", cr: 1.50}
+            ],
+            "3rd Year Odd Semester": [
+                {no: "ChE 3101", title: "Mass Transfer I", cr: 3.00},
+                {no: "ChE 3103", title: "Solution Thermodynamics", cr: 3.00},
+                {no: "ChE 3105", title: "Reaction Engineering", cr: 3.00},
+                {no: "ChE 3107", title: "Unit Operations in Chemical Engineering", cr: 3.00},
+                {no: "ChE 3109", title: "Material and Energy Balance", cr: 3.00},
+                {no: "ChE 3100", title: "Computational Techniques in Chemical Engineering Sessional", cr: 1.50},
+                {no: "ChE 3106", title: "Solution Thermodynamics and Reaction Engineering Sessional", cr: 1.50},
+                {no: "ChE 3108", title: "Unit Operations in Chemical Engineering Sessional", cr: 1.50}
+            ],
+            "3rd Year Even Semester": [
+                {no: "ChE 3201", title: "Mass Transfer II", cr: 3.00},
+                {no: "ChE 3203", title: "Particle Technology", cr: 3.00},
+                {no: "ChE 3205", title: "Chemical Process Technology", cr: 3.00},
+                {no: "ChE 3207", title: "Environmental Engineering and Waste Management", cr: 3.00},
+                {no: "Hum 3229", title: "Principles of Accounting", cr: 3.00},
+                {no: "ChE 3200", title: "Chemical Process Modeling and Simulation Sessional", cr: 1.00},
+                {no: "ChE 3204", title: "Mass Transfer and Particle Technology Sessional", cr: 1.00},
+                {no: "ChE 3208", title: "Environmental Engineering and Waste Management Sessional", cr: 1.50},
+                {no: "ChE 3220", title: "Case Study in Chemical Engineering", cr: 1.00}
+            ],
+            "4th Year Odd Semester": [
+                {no: "ChE 4101", title: "Instrumental Methods and Process Control", cr: 3.00},
+                {no: "ChE 4103", title: "Transport Phenomena", cr: 3.00},
+                {no: "ChE 4105", title: "Process Design", cr: 3.00},
+                {no: "Chem 4129", title: "Chemistry III", cr: 3.00},
+                {no: "ChE 4121", title: "Elective I", cr: 3.00},
+                {no: "ChE 4100", title: "Project and Thesis", cr: 1.50},
+                {no: "ChE 4102", title: "Instrumental Methods and Process Control Sessional", cr: 1.50},
+                {no: "ChE 4110", title: "Seminar", cr: 1.00},
+                {no: "ChE 4120", title: "Capstone Project", cr: 1.50},
+                {no: "ChE 4130", title: "Industrial Training", cr: 1.00},
+                {no: "Chem 4130", title: "Chemistry III Sessional", cr: 1.50}
+            ],
+            "4th Year Even Semester": [
+                {no: "ChE 4201", title: "Economics and Management of Chemical Process Industries", cr: 3.00},
+                {no: "ChE 4203", title: "Corrosion Engineering", cr: 3.00},
+                {no: "ChE 4205", title: "Project Engineering and Professional Ethics", cr: 3.00},
+                {no: "ChE 4207", title: "Safety and Health in Chemical Industries", cr: 3.00},
+                {no: "ChE 4221", title: "Elective II", cr: 3.00},
+                {no: "ChE 4200", title: "Project and Thesis", cr: 3.00},
+                {no: "ChE 4210", title: "Seminar", cr: 1.00},
+                {no: "ChE 4220", title: "Capstone Project", cr: 3.00}
+            ]
+        }
+    };
+
+    function autoLoad() {
+        const dept = document.getElementById('dept-select').value;
+        const sem = document.getElementById('semester-select').value;
+        const container = document.getElementById('course-list');
+        container.innerHTML = '';
+        if(db[dept] && db[dept][sem]) {
+            db[dept][sem].forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'course-row';
+                div.innerHTML = `<input type="text" class="c-no" value="${c.no}"><input type="text" class="c-title" value="${c.title}"><input type="number" step="0.01" class="c-credit" value="${c.cr}" oninput="calc()">`;
+                container.appendChild(div);
+            });
+            calc();
+        }
+    }
+
+    function addManual() {
+        const div = document.createElement('div');
+        div.className = 'course-row';
+        div.innerHTML = `<input type="text" class="c-no"><input type="text" class="c-title"><input type="number" step="0.01" class="c-credit" oninput="calc()">`;
+        document.getElementById('course-list').appendChild(div);
+    }
+
+    function calc() {
+        let sum = 0;
+        document.querySelectorAll('.c-credit').forEach(i => sum += parseFloat(i.value) || 0);
+        document.getElementById('total-val').innerText = sum.toFixed(2);
+    }
+
+    function exportPDF() {
+        document.getElementById('p-dept-v').innerText = document.getElementById('dept-select').value;
+        document.getElementById('p-roll-v').innerText = document.getElementById('roll').value;
+        document.getElementById('p-reg-v').innerText = document.getElementById('reg').value;
+        document.getElementById('p-name-v').innerText = document.getElementById('name').value;
+        document.getElementById('p-session-v').innerText = document.getElementById('semester-select').value || "---";
+        document.getElementById('p-prevCredit-v').innerText = document.getElementById('prevCredit').value;
+        document.getElementById('p-backlog-v').innerText = document.getElementById('backlog').value || "None";
+        document.getElementById('p-total-v').innerText = document.getElementById('total-val').innerText;
+
+        const tbody = document.getElementById('p-tbody');
+        tbody.innerHTML = '';
+        document.querySelectorAll('.course-row').forEach(r => {
+            const no = r.querySelector('.c-no').value;
+            const title = r.querySelector('.c-title').value;
+            const cr = r.querySelector('.c-credit').value;
+            if(no || title) {
+                tbody.innerHTML += `<tr><td>${no}</td><td style="text-align:left">${title}</td><td>${parseFloat(cr||0).toFixed(2)}</td></tr>`;
+            }
+        });
+
+        const wrapper = document.getElementById('pdf-wrapper');
+        const content = document.getElementById('pdf-content');
+        
+        wrapper.style.left = "0";
+        wrapper.style.position = "static";
+
+        const opt = {
+            margin: 0,
+            filename: 'RUET_Form.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF: { unit: 'in', format: 'legal', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(content).save().then(() => {
+            wrapper.style.left = "-5000px";
+            wrapper.style.position = "absolute";
+        });
+    }
+</script>
+
+</body>
+</html>
